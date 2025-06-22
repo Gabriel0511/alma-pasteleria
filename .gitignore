@@ -1,0 +1,18 @@
+# Node / Vite / Vue
+alma-frontend/node_modules/
+alma-frontend/dist/
+alma-frontend/.vite/
+alma-frontend/.env
+
+# Python / Flask
+__pycache__/
+*.pyc
+alma-backend/instance/
+alma-backend/.env
+.env
+
+# General
+*.log
+.DS_Store
+.vscode/
+.idea/
