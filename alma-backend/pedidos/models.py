@@ -2,6 +2,7 @@ from django.db import models
 from django.utils import timezone
 from datetime import timedelta
 from recetas.models import Receta
+from insumos.models import Insumo
 
 # Create your models here.
 # --- CLIENTES ---
@@ -27,7 +28,6 @@ class Pedido(models.Model):
     fecha_entrega = models.DateField()
     fecha_fabricacion = models.DateField(blank=True, null=True)
     estado = models.CharField(max_length=20, choices=ESTADO_PEDIDO, default='pendiente')
-    total = models.DecimalField(max_digits=10, decimal_places=2)
 
     def save(self, *args, **kwargs):
         # Si no se cargó fecha de fabricación manualmente, la calculamos automáticamente
@@ -42,10 +42,15 @@ class DetallePedido(models.Model):
     pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE)
     receta = models.ForeignKey(Receta, on_delete=models.CASCADE)
     cantidad = models.PositiveIntegerField()
-    precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
-    subtotal = models.DecimalField(max_digits=10, decimal_places=2)
     observaciones = models.TextField(blank=True, null=True)
-    ingredientes_extra = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.receta.nombre} x{self.cantidad}"
+
+class IngredientesExtra(models.Model):
+    detalle = models.ForeignKey(DetallePedido, on_delete=models.CASCADE, related_name='ingredientes_extra')
+    insumo = models.ForeignKey(Insumo, on_delete=models.CASCADE)
+    cantidad = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f"{self.insumo.nombre} ({self.cantidad} {self.insumo.unidad_medida})"
