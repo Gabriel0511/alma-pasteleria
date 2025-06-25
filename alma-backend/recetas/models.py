@@ -13,7 +13,7 @@ class Receta(models.Model):
     ]
 
     nombre = models.CharField(max_length=100)
-    rinde = models.IntegerField()
+    rinde = models.PositiveIntegerField()
     unidad_rinde = models.CharField(max_length=20, choices=UNIDADES_RINDE)
     costo_unitario = models.DecimalField(max_digits=10, decimal_places=2)
     costo_total = models.DecimalField(max_digits=10, decimal_places=2)
@@ -25,7 +25,7 @@ class Receta(models.Model):
 class RecetaInsumo(models.Model):
     receta = models.ForeignKey(Receta, on_delete=models.CASCADE)
     insumo = models.ForeignKey(Insumo, on_delete=models.CASCADE)
-    cantidad = models.IntegerField()
+    cantidad = models.PositiveIntegerField()
 
     def __str__(self):
         return f"{self.insumo.nombre} en {self.receta.nombre}"
