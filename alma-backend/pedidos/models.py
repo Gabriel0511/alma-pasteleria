@@ -24,7 +24,7 @@ class Pedido(models.Model):
     ]
 
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
-    fecha_pedido = models.DateTimeField(default=timezone.now)
+    fecha_pedido = models.DateField()
     fecha_entrega = models.DateField()
     fecha_fabricacion = models.DateField(blank=True, null=True)
     estado = models.CharField(max_length=20, choices=ESTADO_PEDIDO, default='pendiente')
