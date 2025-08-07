@@ -2,6 +2,15 @@ from django.db import models
 from django.utils import timezone
 from datetime import timedelta
 
+# --- UNIDADES DE MEDIDA ---
+class UnidadMedida(models.Model):
+    nombre = models.CharField(max_length=50, unique=True)
+    abreviatura = models.CharField(max_length=10, unique=True)
+    descripcion = models.TextField(blank=True, null=True)
+    
+    def __str__(self):
+        return f"{self.nombre} ({self.abreviatura})"
+
 # --- PROVEEDORES ---
 class Proveedor(models.Model):
     nombre = models.CharField(max_length=100)
@@ -10,38 +19,43 @@ class Proveedor(models.Model):
 
     def __str__(self):
         return self.nombre
+    
+# --- CATEGORIAS DE INSUMOS ---
+class CategoriaInsumo(models.Model):
+    nombre = models.CharField(max_length=50, unique=True)
+    descripcion = models.TextField(blank=True, null=True)
+    color = models.CharField(max_length=7, default='#CCCCCC') # Para UI
+    orden = models.PositiveIntegerField(default=0)
+    icono = models.CharField(max_length=30, blank=True, null=True)  # Para usar con icon fonts
+    
+    class Meta:
+        verbose_name = "Categoría de Insumo"
+        verbose_name_plural = "Categorías de Insumos"
+        ordering = ['orden', 'nombre']
+    
+    def __str__(self):
+        return self.nombre
 
 # --- INSUMOS ---
 class Insumo(models.Model):
-    TIPOS_INSUMO = [
-        ('harina', 'Harina'),
-        ('azucares', 'Azúcares'),
-        ('huevos', 'Huevos'),
-        ('grasas', 'Grasas'),
-        ('lacteos', 'Leche y productos lácteos'),
-        ('levaduras', 'Levaduras'),
-        ('esencias', 'Esencias y aromas'),
-        ('colorantes', 'Colorantes'),
-        ('frutas', 'Frutas'),
-        ('frutos_secos', 'Frutos secos'),
-        ('chocolates', 'Chocolates'),
-        ('otros', 'Otros'),
-    ]
-    UNIDAD_MEDIDA = [
-        ('g', 'Gramos'),
-        ('kg', 'Kilogramos'),
-        ('ml', 'Mililitros'),
-        ('l', 'Litros'),
-        ('unidad', 'Unidad'),
-    ]
-
     nombre = models.CharField(max_length=100)
-    tipo_insumo = models.CharField(max_length=50, choices=TIPOS_INSUMO)
-    unidad_medida = models.CharField(max_length=10, choices=UNIDAD_MEDIDA)
+    categoria = models.ForeignKey(CategoriaInsumo, on_delete=models.PROTECT, verbose_name="Tipo de insumo")
+    unidad_medida = models.ForeignKey(UnidadMedida, on_delete=models.PROTECT)
     stock_actual = models.PositiveIntegerField()
     stock_minimo = models.PositiveIntegerField()
     precio_unitario = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     proveedor = models.ForeignKey(Proveedor, on_delete=models.SET_NULL, null=True, blank=True)
+    fecha_actualizacion = models.DateTimeField(auto_now=True)
+    activo = models.BooleanField(default=True)
 
     def __str__(self):
         return self.nombre
+    
+    @property
+    def necesita_reposicion(self):
+        return self.stock_actual < self.stock_minimo
+    
+    class Meta:
+        verbose_name = "Insumo"
+        verbose_name_plural = "Insumos"
+        ordering = ['nombre']
