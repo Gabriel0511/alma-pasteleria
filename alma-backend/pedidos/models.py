@@ -2,7 +2,7 @@ from django.db import models
 from django.utils import timezone
 from datetime import timedelta
 from recetas.models import Receta
-from insumos.models import Insumo
+from insumos.models import Insumo, UnidadMedida
 
 # Create your models here.
 # --- CLIENTES ---
@@ -51,6 +51,7 @@ class IngredientesExtra(models.Model):
     detalle = models.ForeignKey(DetallePedido, on_delete=models.CASCADE, related_name='ingredientes_extra')
     insumo = models.ForeignKey(Insumo, on_delete=models.CASCADE)
     cantidad = models.DecimalField(max_digits=10, decimal_places=2)
+    UnidadMedida = models.ForeignKey(UnidadMedida, on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
         return f"{self.insumo.nombre} ({self.cantidad} {self.insumo.unidad_medida})"

@@ -24,14 +24,11 @@ class Proveedor(models.Model):
 class CategoriaInsumo(models.Model):
     nombre = models.CharField(max_length=50, unique=True)
     descripcion = models.TextField(blank=True, null=True)
-    color = models.CharField(max_length=7, default='#CCCCCC') # Para UI
-    orden = models.PositiveIntegerField(default=0)
-    icono = models.CharField(max_length=30, blank=True, null=True)  # Para usar con icon fonts
     
     class Meta:
         verbose_name = "Categoría de Insumo"
         verbose_name_plural = "Categorías de Insumos"
-        ordering = ['orden', 'nombre']
+        ordering = ['nombre']
     
     def __str__(self):
         return self.nombre
@@ -39,7 +36,13 @@ class CategoriaInsumo(models.Model):
 # --- INSUMOS ---
 class Insumo(models.Model):
     nombre = models.CharField(max_length=100)
-    categoria = models.ForeignKey(CategoriaInsumo, on_delete=models.PROTECT, verbose_name="Tipo de insumo")
+    categoria = models.ForeignKey(
+        CategoriaInsumo,
+        on_delete=models.PROTECT,
+        null=True,  # Permite valores nulos
+        blank=True,  # Opcional para el admin
+        verbose_name="Categoria de insumo"
+    )
     unidad_medida = models.ForeignKey(UnidadMedida, on_delete=models.PROTECT)
     stock_actual = models.PositiveIntegerField()
     stock_minimo = models.PositiveIntegerField()
